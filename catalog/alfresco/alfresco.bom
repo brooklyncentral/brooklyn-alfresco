@@ -5,7 +5,7 @@ brooklyn.catalog:
       Alfresco is a free/libre enterprise content management system
     version: &alfrescoVersion "1.0.0-SNAPSHOT" # BROOKLYN_ALFRESCO_VERSION
     iconUrl: &alfrescoIconUrl "https://github.com/Alfresco.png"
-    licence: &alfrescoLicence "Apache-2.0"
+    license_code: &alfrescoLicence "Apache-2.0"
   items:
     - id: alfresco
       name: *alfrescoName
