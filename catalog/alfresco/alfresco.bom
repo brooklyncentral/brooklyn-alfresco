@@ -255,7 +255,7 @@ brooklyn.catalog:
                   - $brooklyn:config("alfresco.tomcat.server.port")
           - type: org.apache.brooklyn.enricher.stock.Transformer
             brooklyn.config:
-              uniqueTag: alfresco-main-uri-enricher
+              uniqueTag: alfresco-admin-uri-enricher
               enricher.producer: $brooklyn:entity("alfresco")
               enricher.triggerSensors:
                 - $brooklyn:sensor("host.address")
