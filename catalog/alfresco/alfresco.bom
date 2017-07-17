@@ -118,7 +118,7 @@ brooklyn.catalog:
           type: integer
           default: 8443
         - name: alfresco.tomcat.server.ajp.port
-          label: "Alfresco tomcate server ajp port"
+          label: "Alfresco tomcat server ajp port"
           type: integer
           default: 8009
         - name: alfresco.libreoffice.port
@@ -153,7 +153,7 @@ brooklyn.catalog:
         - name: alfresco.download.url
           label: "Alfresco download url"
           description: |
-            The alfresco download url
+            The Alfresco download url
           type: string
           default: "http://eu.dl.alfresco.com.s3.amazonaws.com/release/community/201702-build-00016/alfresco-community-installer-201702-linux-x64.bin"
 
@@ -267,7 +267,7 @@ brooklyn.catalog:
                   - $brooklyn:attributeWhenReady("host.address")
                   - $brooklyn:config("alfresco.tomcat.server.port")
     - id: alfresco-cluster
-      name: &alfrescoClusterName Alfresco Cummunity Edition - Cluster
+      name: &alfrescoClusterName Alfresco Community Edition - Cluster
       version: *alfrescoVersion
       iconUrl: *alfrescoIconUrl
       description: *alfrescoDescription
