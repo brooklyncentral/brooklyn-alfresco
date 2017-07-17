@@ -318,7 +318,7 @@ brooklyn.catalog:
           pre.launch.command: |
             # Commenting the line with IP 0.0.0.0/0 and adding our own.
             sudo su -c "sed -i 's/^\(.*0\.0\.0\.0.*\)$/#\1/g' $POSTGRESQL_DATA/data/pg_hba.conf"
-            sudo su -c "echo 'host all all $ALFRESCO_HOST password' >> $POSTGRESQL_DATA/data/pg_hba.conf"
+            sudo su -c "echo 'host all all $ALFRESCO_HOST/32 password' >> $POSTGRESQL_DATA/data/pg_hba.conf"
             sudo su -c "echo 'host all all $ALFRESCO_SUBHOST/32 password' >> $POSTGRESQL_DATA/data/pg_hba.conf"
         - id: alfresco
           type: alfresco
