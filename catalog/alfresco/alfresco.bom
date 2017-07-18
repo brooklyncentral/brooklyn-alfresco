@@ -303,7 +303,12 @@ brooklyn.catalog:
             postgresql.password: &alfrescoDbTierPassword $brooklyn:config("alfresco.cluster.db.password")
             postgresql.database: &alfrescoDbTierDatabase $brooklyn:config("alfresco.cluster.db.database")
             postgresql.maxConnections: 275
-            datastore.creation.script.contents: $brooklyn:formatString("CREATE USER %1$s WITH PASSWORD '%2$s' CREATEDB; CREATE DATABASE %3$s OWNER %1$s;", config("postgresql.username"), config("postgresql.password"), config("postgresql.database"))
+            datastore.creation.script.contents:
+              $brooklyn:formatString:
+              - "CREATE USER %1$s WITH PASSWORD '%2$s' CREATEDB; CREATE DATABASE %3$s OWNER %1$s;"
+              - $brooklyn:config("postgresql.username")
+              - $brooklyn:config("postgresql.password")
+              - $brooklyn:config("postgresql.database")
             shell.env:
               POSTGRESQL_DATA: $brooklyn:attributeWhenReady("run.dir")
               ALFRESCO_HOST: $brooklyn:entity("alfresco").attributeWhenReady("host.address")
@@ -316,7 +321,11 @@ brooklyn.catalog:
         - id: alfresco
           type: alfresco
           brooklyn.config:
-            alfresco.jdbc.url: $brooklyn:formatString("jdbc:%s%s", component("alfresco-db-tier").attributeWhenReady("datastore.url"), config("alfresco.jdbc.database"))
+            alfresco.jdbc.url:
+              $brooklyn:formatString:
+              - "jdbc:%s%s"
+              - $brooklyn:entity("alfresco-db-tier").attributeWhenReady("datastore.url")
+              - $brooklyn:config("alfresco.jdbc.database")
             alfresco.jdbc.username: *alfrescoDbTierUsername
             alfresco.jdbc.password: *alfrescoDbTierPassword
             alfresco.jdbc.database: *alfrescoDbTierDatabase
