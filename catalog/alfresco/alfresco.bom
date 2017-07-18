@@ -303,16 +303,16 @@ brooklyn.catalog:
             postgresql.password: &alfrescoDbTierPassword $brooklyn:config("alfresco.cluster.db.password")
             postgresql.database: &alfrescoDbTierDatabase $brooklyn:config("alfresco.cluster.db.database")
             postgresql.maxConnections: 275
-          datastore.creation.script.contents: $brooklyn:formatString("CREATE USER %1$s WITH PASSWORD '%2$s' CREATEDB; CREATE DATABASE %3$s OWNER %1$s;", config("postgresql.username"), config("postgresql.password"), config("postgresql.database"))
-          shell.env:
-            POSTGRESQL_DATA: $brooklyn:attributeWhenReady("run.dir")
-            ALFRESCO_HOST: $brooklyn:entity("alfresco").attributeWhenReady("host.address")
-            ALFRESCO_SUBHOST: $brooklyn:entity("alfresco").attributeWhenReady("host.subnet.address")
-          pre.launch.command: |
-            # Commenting the line with IP 0.0.0.0/0 and adding our own.
-            sudo su -c "sed -i 's/^\(.*0\.0\.0\.0.*\)$/#\1/g' $POSTGRESQL_DATA/data/pg_hba.conf"
-            sudo su -c "echo 'host all all $ALFRESCO_HOST/32 password' >> $POSTGRESQL_DATA/data/pg_hba.conf"
-            sudo su -c "echo 'host all all $ALFRESCO_SUBHOST/32 password' >> $POSTGRESQL_DATA/data/pg_hba.conf"
+            datastore.creation.script.contents: $brooklyn:formatString("CREATE USER %1$s WITH PASSWORD '%2$s' CREATEDB; CREATE DATABASE %3$s OWNER %1$s;", config("postgresql.username"), config("postgresql.password"), config("postgresql.database"))
+            shell.env:
+              POSTGRESQL_DATA: $brooklyn:attributeWhenReady("run.dir")
+              ALFRESCO_HOST: $brooklyn:entity("alfresco").attributeWhenReady("host.address")
+              ALFRESCO_SUBHOST: $brooklyn:entity("alfresco").attributeWhenReady("host.subnet.address")
+            pre.launch.command: |
+              # Commenting the line with IP 0.0.0.0/0 and adding our own.
+              sudo su -c "sed -i 's/^\(.*0\.0\.0\.0.*\)$/#\1/g' $POSTGRESQL_DATA/data/pg_hba.conf"
+              sudo su -c "echo 'host all all $ALFRESCO_HOST/32 password' >> $POSTGRESQL_DATA/data/pg_hba.conf"
+              sudo su -c "echo 'host all all $ALFRESCO_SUBHOST/32 password' >> $POSTGRESQL_DATA/data/pg_hba.conf"
         - id: alfresco
           type: alfresco
           brooklyn.config:
