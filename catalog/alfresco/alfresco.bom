@@ -273,7 +273,7 @@ brooklyn.catalog:
       description: *alfrescoDescription
       itemType: entity
       item:
-        type: org.apache.brooklyn.entity.software.base.VanillaSoftwareProcess
+        type: org.apache.brooklyn.entity.stock.BasicStartable
         name: *alfrescoClusterName
         id: alfresco-cluster
         brooklyn.parameters:
@@ -300,7 +300,7 @@ brooklyn.catalog:
           default: 5432
           constraints:
           - required
-        services:
+        brooklyn.children:
         - id: alfresco-db-tier
           type: org.apache.brooklyn.entity.database.postgresql.PostgreSqlNode
           name: Alfresco - Database tier
