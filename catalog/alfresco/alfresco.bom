@@ -294,12 +294,6 @@ brooklyn.catalog:
           type: string
           constraints:
           - required
-        - name: alfresco.cluster.db.port
-          label: "Alfresco database port"
-          type: integer
-          default: 5432
-          constraints:
-          - required
         brooklyn.children:
         - id: alfresco-db-tier
           type: org.apache.brooklyn.entity.database.postgresql.PostgreSqlNode
@@ -307,7 +301,6 @@ brooklyn.catalog:
           brooklyn.config:
             postgresql.username: &alfrescoDbTierUsername $brooklyn:config("alfresco.cluster.db.username")
             postgresql.password: &alfrescoDbTierPassword $brooklyn:config("alfresco.cluster.db.password")
-            postgresql.port: &alfrescoDbTierPort $brooklyn:config("alfresco.cluster.db.port")
             postgresql.database: &alfrescoDbTierDatabase $brooklyn:config("alfresco.cluster.db.database")
             postgresql.maxConnections: 275
           datastore.creation.script.contents: $brooklyn:formatString("CREATE USER %1$s WITH PASSWORD '%2$s' CREATEDB; CREATE DATABASE %3$s OWNER %1$s;", config("postgresql.username"), config("postgresql.password"), config("postgresql.database"))
@@ -327,5 +320,5 @@ brooklyn.catalog:
             alfresco.jdbc.username: *alfrescoDbTierUsername
             alfresco.jdbc.password: *alfrescoDbTierPassword
             alfresco.jdbc.database: *alfrescoDbTierDatabase
-            alfresco.postgres.port: *alfrescoDbTierPort
+            alfresco.postgres.port: $brooklyn:entity("alfresco-db-tier").config("alfresco.cluster.db.port")
             alfresco.disabled.components: alfrescosolr,alfrescowcmqs,postgres
