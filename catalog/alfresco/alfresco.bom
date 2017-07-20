@@ -107,27 +107,27 @@ brooklyn.catalog:
           type: string
         - name: alfresco.tomcat.server.port
           label: "Alfresco tomcat server port"
-          type: integer
+          type: port
           default: 8080
         - name: alfresco.tomcat.server.shutdown.port
           label: "Alfresco tomcat server shutdown port"
-          type: integer
+          type: port
           default: 8005
         - name: alfresco.tomcat.server.ssl.port
           label: "Alfresco tomcat server ssl port"
-          type: integer
+          type: port
           default: 8443
         - name: alfresco.tomcat.server.ajp.port
           label: "Alfresco tomcat server ajp port"
-          type: integer
+          type: port
           default: 8009
         - name: alfresco.libreoffice.port
           label: "Alfresco libreoffice port"
-          type: integer
+          type: port
           default: 8100
         - name: alfresco.ftp.port
           label: "Alfresco ftp port"
-          type: integer
+          type: port
           default: 21
         - name: alfresco.admin.password
           label: "Alfresco admin password"
@@ -175,12 +175,12 @@ brooklyn.catalog:
             ALFRESCO_POSTGRES_PORT: $brooklyn:config("alfresco.postgres.port")
             ALFRESCO_TOMCAT_INSTALLATION_TYPE: $brooklyn:config("alfresco.tomcat.installation.type")
             ALFRESCO_TOMCAT_SERVER_DOMAIN: $brooklyn:config("alfresco.tomcat.server.domain")
-            ALFRESCO_TOMCAT_SERVER_PORT: $brooklyn:config("alfresco.tomcat.server.port")
-            ALFRESCO_TOMCAT_SERVER_SHUTDOWN_PORT: $brooklyn:config("alfresco.tomcat.server.shutdown.port")
-            ALFRESCO_TOMCAT_SERVER_SSL_PORT: $brooklyn:config("alfresco.tomcat.server.ssl.port")
-            ALFRESCO_TOMCAT_SERVER_AJP_PORT: $brooklyn:config("alfresco.tomcat.server.ajp.port")
-            ALFRESCO_LIBREOFFICE_PORT: $brooklyn:config("alfresco.libreoffice.port")
-            ALFRESCO_FTP_PORT: $brooklyn:config("alfresco.ftp.port")
+            ALFRESCO_TOMCAT_SERVER_PORT: $brooklyn:attributeWhenReady("alfresco.tomcat.server.port")
+            ALFRESCO_TOMCAT_SERVER_SHUTDOWN_PORT: $brooklyn:attributeWhenReady("alfresco.tomcat.server.shutdown.port")
+            ALFRESCO_TOMCAT_SERVER_SSL_PORT: $brooklyn:attributeWhenReady("alfresco.tomcat.server.ssl.port")
+            ALFRESCO_TOMCAT_SERVER_AJP_PORT: $brooklyn:attributeWhenReady("alfresco.tomcat.server.ajp.port")
+            ALFRESCO_LIBREOFFICE_PORT: $brooklyn:attributeWhenReady("alfresco.libreoffice.port")
+            ALFRESCO_FTP_PORT: $brooklyn:attributeWhenReady("alfresco.ftp.port")
             ALFRESCO_ADMIN_PASSWORD: $brooklyn:config("alfresco.admin.password")
             ALFRESCO_BASEUNIXSERVICE_INSTALL_AS_SERVICE: $brooklyn:config("alfresco.base.unix.service.install.as.service")
             ALFRESCO_BASEUNIXSERVICE_SCRIPT_NAME: $brooklyn:config("alfresco.base.unix.service.script.name")
@@ -246,26 +246,90 @@ brooklyn.catalog:
               enricher.producer: $brooklyn:entity("alfresco")
               enricher.triggerSensors:
                 - $brooklyn:sensor("host.address")
+                - $brooklyn:sensor("alfresco.tomcat.server.port")
               enricher.targetSensor:
                 $brooklyn:sensor("org.apache.brooklyn.core.entity.Attributes", "main.uri")
               enricher.targetValue:
                 $brooklyn:formatString:
                   - "http://%s:%s/share/"
                   - $brooklyn:attributeWhenReady("host.address")
-                  - $brooklyn:config("alfresco.tomcat.server.port")
+                  - $brooklyn:attributeWhenReady("alfresco.tomcat.server.port")
           - type: org.apache.brooklyn.enricher.stock.Transformer
             brooklyn.config:
               uniqueTag: alfresco-admin-uri-enricher
               enricher.producer: $brooklyn:entity("alfresco")
               enricher.triggerSensors:
                 - $brooklyn:sensor("host.address")
+                - $brooklyn:sensor("alfresco.tomcat.server.port")
               enricher.targetSensor:
                 $brooklyn:sensor("admin.ui")
               enricher.targetValue:
                 $brooklyn:formatString:
                   - "http://%s:%s/alfresco/"
                   - $brooklyn:attributeWhenReady("host.address")
-                  - $brooklyn:config("alfresco.tomcat.server.port")
+                  - $brooklyn:attributeWhenReady("alfresco.tomcat.server.port")
+
+    - id: alfresco-db
+      name: Alfresco Database
+      version: *alfrescoVersion
+      iconUrl: *alfrescoIconUrl
+      description: PostgreSQL configured for use with Alfresco
+      item:
+        type: org.apache.brooklyn.entity.database.postgresql.PostgreSqlNode
+        name: Alfresco - PostgreSQL Database
+
+        brooklyn.parameters:
+        - &alfrescoDbName
+          name: alfresco.db.database
+          label: "Alfresco database name"
+          type: string
+          default: alfresco
+          constraints:
+          - required
+        - &alfrescoDbUsername
+          name: alfresco.db.username
+          label: "Alfresco database username"
+          type: string
+          default: alfresco
+          constraints:
+          - required
+        - &alfrescoDbPassword
+          name: alfresco.db.password
+          label: "Alfresco database password"
+          type: string
+          constraints:
+          - required
+        - name: alfresco.host.address
+          label: "Alfresco host address"
+          type: string
+          constraints:
+          - required
+        brooklyn.config:
+          postgresql.username: $brooklyn:config("alfresco.db.username")
+          postgresql.password: $brooklyn:config("alfresco.db.password")
+          postgresql.database: $brooklyn:config("alfresco.db.database")
+          postgresql.maxConnections: 275
+          datastore.creation.script.contents:
+            $brooklyn:formatString:
+            - "CREATE USER %1$s WITH PASSWORD '%2$s' CREATEDB; CREATE DATABASE %3$s OWNER %1$s;"
+            - $brooklyn:config("postgresql.username")
+            - $brooklyn:config("postgresql.password")
+            - $brooklyn:config("postgresql.database")
+          pre.launch.command:
+            $brooklyn:formatString:
+            # Commenting the line with IP 0.0.0.0/0 and adding our own.
+            - |
+              POSTGRESQL_DATA="%s"
+              ALFRESCO_HOST="%s"
+              ALFRESCO_SUBNET="%s"
+              sudo su -c "sed -i 's/^\(.*0\.0\.0\.0.*\)$/#\1/g' ${POSTGRESQL_DATA}/data/pg_hba.conf"
+              sudo su -c "echo 'host all all ${ALFRESCO_HOST}/32 password' >> ${POSTGRESQL_DATA}/data/pg_hba.conf"
+              sudo su -c "echo 'host all all ${ALFRESCO_SUBNET}/32 password' >> ${POSTGRESQL_DATA}/data/pg_hba.conf"
+            - $brooklyn:attributeWhenReady("run.dir")
+            - $brooklyn:config("alfresco.host.address")
+            - $brooklyn:config("alfresco.host.subnet")
+
+
     - id: alfresco-cluster
       name: &alfrescoClusterName Alfresco Community Edition - Cluster
       version: *alfrescoVersion
@@ -277,57 +341,24 @@ brooklyn.catalog:
         name: *alfrescoClusterName
         id: alfresco-cluster
         brooklyn.parameters:
-        - name: alfresco.cluster.db.database
-          label: "Alfresco database name"
-          type: string
-          default: alfresco
-          constraints:
-          - required
-        - name: alfresco.cluster.db.username
-          label: "Alfresco database username"
-          type: string
-          default: alfresco
-          constraints:
-          - required
-        - name: alfresco.cluster.db.password
-          label: "Alfresco database password"
-          type: string
-          constraints:
-          - required
+        - *alfrescoDbName
+        - *alfrescoDbUsername
+        - *alfrescoDbPassword
         brooklyn.children:
-        - id: alfresco-db-tier
-          type: org.apache.brooklyn.entity.database.postgresql.PostgreSqlNode
-          name: Alfresco - Database tier
+        - id: alfresco-db
+          type: alfresco-db
           brooklyn.config:
-            postgresql.username: &alfrescoDbTierUsername $brooklyn:config("alfresco.cluster.db.username")
-            postgresql.password: &alfrescoDbTierPassword $brooklyn:config("alfresco.cluster.db.password")
-            postgresql.database: &alfrescoDbTierDatabase $brooklyn:config("alfresco.cluster.db.database")
-            postgresql.maxConnections: 275
-            datastore.creation.script.contents:
-              $brooklyn:formatString:
-              - "CREATE USER %1$s WITH PASSWORD '%2$s' CREATEDB; CREATE DATABASE %3$s OWNER %1$s;"
-              - $brooklyn:config("postgresql.username")
-              - $brooklyn:config("postgresql.password")
-              - $brooklyn:config("postgresql.database")
-            shell.env:
-              POSTGRESQL_DATA: $brooklyn:attributeWhenReady("run.dir")
-              ALFRESCO_HOST: $brooklyn:entity("alfresco").attributeWhenReady("host.address")
-              ALFRESCO_SUBHOST: $brooklyn:entity("alfresco").attributeWhenReady("host.subnet.address")
-            pre.launch.command: |
-              # Commenting the line with IP 0.0.0.0/0 and adding our own.
-              sudo su -c "sed -i 's/^\(.*0\.0\.0\.0.*\)$/#\1/g' $POSTGRESQL_DATA/data/pg_hba.conf"
-              sudo su -c "echo 'host all all $ALFRESCO_HOST/32 password' >> $POSTGRESQL_DATA/data/pg_hba.conf"
-              sudo su -c "echo 'host all all $ALFRESCO_SUBHOST/32 password' >> $POSTGRESQL_DATA/data/pg_hba.conf"
+            alfresco.host.address: $brooklyn:entity("alfresco").attributeWhenReady("host.address")
         - id: alfresco
           type: alfresco
           brooklyn.config:
             alfresco.jdbc.url:
               $brooklyn:formatString:
               - "jdbc:%s%s"
-              - $brooklyn:entity("alfresco-db-tier").attributeWhenReady("datastore.url")
+              - $brooklyn:entity("alfresco-db").attributeWhenReady("datastore.url")
               - $brooklyn:config("alfresco.jdbc.database")
-            alfresco.jdbc.username: *alfrescoDbTierUsername
-            alfresco.jdbc.password: *alfrescoDbTierPassword
-            alfresco.jdbc.database: *alfrescoDbTierDatabase
-            alfresco.postgres.port: $brooklyn:entity("alfresco-db-tier").config("alfresco.cluster.db.port")
+            alfresco.jdbc.database: $brooklyn:config("alfresco.db.database")
+            alfresco.jdbc.username: $brooklyn:config("alfresco.db.username")
+            alfresco.jdbc.password: $brooklyn:config("alfresco.db.password")
+            alfresco.postgres.port: $brooklyn:entity("alfresco-db").attributeWhenReady("postgresql.port")
             alfresco.disabled.components: alfrescosolr,alfrescowcmqs,postgres
