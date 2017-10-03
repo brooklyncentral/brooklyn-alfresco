@@ -5,11 +5,12 @@ brooklyn.catalog:
     - "https://raw.githubusercontent.com/brooklyncentral/common-catalog-utils/master/common-tests/src/main/resources/commontests/common.tests.bom"
     - id: alfresco-tests
       version: *alfrescoVersion
-      itemType: template
+      itemType: entity
       iconUrl: *alfrescoIconUrl
       name: "Alfresco Community Edition Tests"
       item:
-        services:
+        type: org.apache.brooklyn.entity.stock.BasicStartable
+        brooklyn.children:
           - type: alfresco
             id: alfresco
             brooklyn.config:
