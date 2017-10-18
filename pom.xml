@@ -7,7 +7,19 @@
     <groupId>io.brooklyncentral.alfresco</groupId>
     <artifactId>brooklyn-alfresco</artifactId>
     <version>1.0.0-SNAPSHOT</version>
+    
+    <parent>
+        <groupId>io.brooklyn</groupId>
+        <artifactId>brooklyncentral-parent</artifactId>
+        <version>1.0.0</version>
+    </parent>
+
     <name>Brooklyn :: Alfresco</name>
+    <description>
+        This is the core Apache Brooklyn integration for deployment and in-life management of Alfresco Community Edition
+    </description>
+    <url>https://github.com/brooklyncentral/brookly-alfresco</url>
+    <inceptionYear>2017</inceptionYear>
 
     <properties>
         <build-helper-maven-plugin.version>3.0.0</build-helper-maven-plugin.version>
@@ -20,12 +32,21 @@
         <developerConnection>scm:git:git@github.com:brooklyncentral/brooklyn-alfresco.git</developerConnection>
         <tag>HEAD</tag>
     </scm>
+
     <licenses>
         <license>
             <name>Apache 2.0</name>
             <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
         </license>
     </licenses>
+
+    <!-- For the full list of developers, see contributors to https://github.com/brooklyncentral/brooklyn-alfresco -->
+    <developers>
+        <developer>
+            <name>Thomas Bouron</name>
+            <organizationUrl>https://github.com/tbouron</organizationUrl>
+        </developer>
+    </developers>
 
     <build>
         <resources>
