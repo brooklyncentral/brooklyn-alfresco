@@ -155,7 +155,7 @@ brooklyn.catalog:
           description: |
             The Alfresco download url
           type: string
-          default: "http://eu.dl.alfresco.com.s3.amazonaws.com/release/community/201702-build-00016/alfresco-community-installer-201702-linux-x64.bin"
+          default: "https://download.alfresco.com/release/community/201707-build-00028/alfresco-community-installer-201707-linux-x64.bin"
 
         brooklyn.config:
           shell.env:
@@ -187,7 +187,7 @@ brooklyn.catalog:
             ALFRESCO_SERVICES_STARTUP: $brooklyn:config("alfresco.services.startup")
           install.command: |
             sudo yum update -y
-            sudo yum install -y augeas java-1.8.0-openjdk
+            sudo yum install -y curl augeas java-1.8.0-openjdk
             curl --retry 5 --keepalive-time 30 --speed-time 30 -L "${ALFRESCO_DOWNLOAD_URL}" --output ${INSTALL_DIR}/alfresco-community-installer-linux-x64.bin
             chmod u+x ${INSTALL_DIR}/alfresco-community-installer-linux-x64.bin
             function writeAlfrescoInstallProperty(){
