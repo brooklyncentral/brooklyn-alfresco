@@ -1,5 +1,5 @@
 brooklyn.catalog:
-  version: &alfrescoVersion "1.1.0-SNAPSHOT" # BROOKLYN_ALFRESCO_VERSION
+  version: &alfrescoVersion "1.0.1" # BROOKLYN_ALFRESCO_VERSION
   iconUrl: &alfrescoIconUrl "https://github.com/Alfresco.png"
   items:
     - "https://raw.githubusercontent.com/brooklyncentral/common-catalog-utils/master/common-tests/src/main/resources/commontests/common.tests.bom"
