@@ -14,7 +14,7 @@ brooklyn.catalog:
           - type: alfresco
             id: alfresco
             brooklyn.config:
-              alfresco.admin.password: p@55w0rd
+              alfresco.admin.password: fTdXknM2DsjzCHDRoJMTq9aG
           - type: test-case
             name: "Alfresco Community Edition Tests"
             brooklyn.config:
