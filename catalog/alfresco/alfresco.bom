@@ -186,7 +186,6 @@ brooklyn.catalog:
             ALFRESCO_BASEUNIXSERVICE_SCRIPT_NAME: $brooklyn:config("alfresco.base.unix.service.script.name")
             ALFRESCO_SERVICES_STARTUP: $brooklyn:config("alfresco.services.startup")
           install.command: |
-            sudo yum update -y
             sudo yum install -y curl augeas java-1.8.0-openjdk
             curl --retry 5 --keepalive-time 30 --speed-time 30 -L "${ALFRESCO_DOWNLOAD_URL}" --output ${INSTALL_DIR}/alfresco-community-installer-linux-x64.bin
             chmod u+x ${INSTALL_DIR}/alfresco-community-installer-linux-x64.bin
